@@ -1,0 +1,32 @@
+version: "3.2"
+
+services:
+    app:
+        build:
+            context: app/
+            args:
+                GIT_PAK: $GIT_PAK
+                GIT_USR: $GIT_USR
+                HOME: $HOME
+                APP_HOME: $APP_HOME
+        volumes:
+            - static_volume:/home/app/suss.space-pub/flaskapp/static
+            - ./app/gunicorn/config:/home/app/suss.space-pub/gunicorn/config
+            - ./app/gunicorn/log:/var/log/gunicorn
+        ports:
+            - "8000:8000"
+
+    nginx:
+      build: ./nginx
+      volumes:
+        - static_volume:/home/app/suss.space-pub/flaskapp/static
+        - ./nginx/config:/etc/nginx/conf.d
+        - ./nginx/log:/var/log/nginx
+      ports:
+        - "80:80"
+        - "443:443"
+      depends_on:
+        - app
+
+volumes:
+    static_volume:
